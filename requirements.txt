@@ -1,3 +1,4 @@
 progressbar2
 numpy
-keras
+keras==2.2.2
+tensorflow==1.10.1

@@ -5,7 +5,8 @@ from metrics.accuracy import conlleval
 
 from keras.models import Sequential
 from keras.layers.embeddings import Embedding
-from keras.layers.recurrent import GRU
+from keras.layers.recurrent import LSTM
+from keras.layers.wrappers import Bidirectional
 from keras.layers.core import Dense, Dropout
 from keras.layers.wrappers import TimeDistributed
 from keras.layers import Conv1D
@@ -29,7 +30,7 @@ model = Sequential()
 model.add(Embedding(n_vocab, 100))
 model.add(Conv1D(64, 5, border_mode='same', activation='relu'))
 model.add(Dropout(0.25))
-model.add(GRU(100, return_sequences=True))
+model.add(Bidirectional(LSTM(100, return_sequences=True)))
 model.add(TimeDistributed(Dense(n_classes, activation='softmax')))
 model.compile('rmsprop', 'categorical_crossentropy')
 

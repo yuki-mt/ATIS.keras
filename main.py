@@ -1,7 +1,7 @@
 import numpy as np
 
 import data.load
-from metrics.accuracy import conlleval
+from metrics import conlleval
 
 from keras.models import Sequential
 from keras.layers.embeddings import Embedding
@@ -38,9 +38,9 @@ model.compile('rmsprop', 'categorical_crossentropy')
 train_x, train_ne, train_label = train_set
 val_x, val_ne, val_label = valid_set
 
-words_val = [list(map(lambda x: idx2w[x], w)) for w in val_x]
+# words_val = [list(map(lambda x: idx2w[x], w)) for w in val_x]
 groundtruth_val = [list(map(lambda x: idx2la[x], y)) for y in val_label]
-words_train = [list(map(lambda x: idx2w[x], w)) for w in train_x]
+# words_train = [list(map(lambda x: idx2w[x], w)) for w in train_x]
 groundtruth_train = [list(map(lambda x: idx2la[x], y)) for y in train_label]
 
 
@@ -72,10 +72,10 @@ for i in range(n_epochs):
     avgLoss = avgLoss/n_batch
 
     predword_train = [list(map(lambda x: idx2la[x], y)) for y in train_pred_label]
-    con_dict = conlleval(predword_train, groundtruth_train, words_train, 'r.txt')
-    train_f_scores.append(con_dict['f1'])
+    prec, rec, f1 = conlleval(predword_train, groundtruth_train)
+    train_f_scores.append(f1)
     print('Loss = {}, Precision = {}, Recall = {}, F1 = {}'.format(
-        avgLoss, con_dict['r'], con_dict['p'], con_dict['f1']))
+        avgLoss, rec, prec, f1))
 
     print("Validating =>")
 
@@ -99,14 +99,14 @@ for i in range(n_epochs):
     avgLoss = avgLoss/n_batch
 
     predword_val = [list(map(lambda x: idx2la[x], y)) for y in val_pred_label]
-    con_dict = conlleval(predword_val, groundtruth_val, words_val, 'r.txt')
-    val_f_scores.append(con_dict['f1'])
+    prec, rec, f1 = conlleval(predword_val, groundtruth_val)
+    val_f_scores.append(f1)
 
     print('Loss = {}, Precision = {}, Recall = {}, F1 = {}'.format(
-        avgLoss, con_dict['r'], con_dict['p'], con_dict['f1']))
+        avgLoss, rec, prec, f1))
 
-    if con_dict['f1'] > best_val_f1:
-        best_val_f1 = con_dict['f1']
+    if f1 > best_val_f1:
+        best_val_f1 = f1
         open('model_architecture.json', 'w').write(model.to_json())
         model.save_weights('best_model_weights.h5', overwrite=True)
         print("Best validation F1 score = {}".format(best_val_f1))

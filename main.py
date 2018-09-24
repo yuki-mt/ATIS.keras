@@ -28,7 +28,7 @@ n_vocab = len(idx2w)
 # Define model
 model = Sequential()
 model.add(Embedding(n_vocab, 100))
-model.add(Conv1D(64, 5, border_mode='same', activation='relu'))
+model.add(Conv1D(64, 5, padding='same', activation='relu'))
 model.add(Dropout(0.25))
 model.add(Bidirectional(LSTM(100, return_sequences=True)))
 model.add(TimeDistributed(Dense(n_classes, activation='softmax')))
